@@ -1,8 +1,9 @@
 # Page Reporter v2.6.1
 #
-# v2.6.1 fix:
-#  - Only announce page load if the treeInterceptor is the active/foreground one
-#    (fixes repeated announcements when tabs load in background or focus is outside browser)
+# v2.6.2 fix:
+#  - Re-check the active browser/browse buffer before scheduling, waiting, and speaking.
+#  - Ignore foreground title changes after focus leaves the browser.
+#  - Avoid reporting generic non-web virtual buffers as page loads.
 #
 # v3.4 changes:
 #  - REMOVED from NVDA config system entirely (no more config.conf.spec injection)
@@ -107,6 +108,23 @@ _FM = frozenset({controlTypes.Role.EDITABLETEXT, controlTypes.Role.COMBOBOX,
                  controlTypes.Role.CHECKBOX, controlTypes.Role.RADIOBUTTON})
 _LM = frozenset({controlTypes.Role.LANDMARK, controlTypes.Role.REGION})
 
+_BROWSER_APP_NAMES = frozenset({
+    "arc",
+    "brave",
+    "chrome",
+    "chromium",
+    "dragon",
+    "firefox",
+    "floorp",
+    "iexplore",
+    "librewolf",
+    "msedge",
+    "opera",
+    "vivaldi",
+    "waterfox",
+    "zen",
+})
+
 # ---------------------------------------------------------------------------
 # URL / title helpers
 # ---------------------------------------------------------------------------
@@ -154,6 +172,32 @@ def _getDomain(ti):
     except Exception:
         return ""
 
+def _getAppNameFromObj(obj):
+    try:
+        appModule = getattr(obj, "appModule", None)
+        appName = getattr(appModule, "appName", None)
+        return appName.lower() if appName else ""
+    except Exception:
+        return ""
+
+def _getTIAppName(ti):
+    try:
+        appName = _getAppNameFromObj(getattr(ti, "rootNVDAObject", None))
+        if appName:
+            return appName
+    except Exception:
+        pass
+    try:
+        import api
+        return _getAppNameFromObj(api.getFocusObject())
+    except Exception:
+        return ""
+
+def _looksLikeWebDocument(ti):
+    if _getURL(ti):
+        return True
+    return _getTIAppName(ti) in _BROWSER_APP_NAMES
+
 # ---------------------------------------------------------------------------
 # busy:true retry
 # ---------------------------------------------------------------------------
@@ -181,13 +225,19 @@ def _waitThenAnnounce(tiRef, cancel_event):
         done   = threading.Event()
         def _check():
             try:
-                result[0] = (ti.isReady, _isBusy(ti))
+                if not _shouldReportTI(ti):
+                    result[0] = (False, True, False)
+                else:
+                    result[0] = (ti.isReady, _isBusy(ti), True)
             except Exception:
-                result[0] = (False, True)
+                result[0] = (False, True, False)
             done.set()
         queueHandler.queueFunction(queueHandler.eventQueue, _check)
         done.wait(timeout=1.0)
-        is_ready, is_busy = result[0] or (False, True)
+        is_ready, is_busy, is_active = result[0] or (False, True, False)
+        if not is_active:
+            cancel_event.set()
+            return
         timed_out = time.monotonic() >= deadline
 
         if (is_ready and not is_busy) or timed_out:
@@ -195,13 +245,19 @@ def _waitThenAnnounce(tiRef, cancel_event):
             roles_done   = threading.Event()
             def _getRoles():
                 try:
-                    roles_result[0] = _rolesFromFields(ti)
+                    if not _shouldReportTI(ti):
+                        roles_result[0] = (False, None)
+                    else:
+                        roles_result[0] = (True, _rolesFromFields(ti))
                 except Exception:
-                    roles_result[0] = None
+                    roles_result[0] = (True, None)
                 roles_done.set()
             queueHandler.queueFunction(queueHandler.eventQueue, _getRoles)
             roles_done.wait(timeout=1.0)
-            roles = roles_result[0]
+            roles_active, roles = roles_result[0] or (False, None)
+            if not roles_active:
+                cancel_event.set()
+                return
 
             has_content = roles is not None and len(roles) > 0
             if has_content or timed_out:
@@ -334,12 +390,16 @@ def _summary(c):
         return f"Page loaded. Page has {p[0]}."
     return "Page loaded. Page has " + ", ".join(p[:-1]) + f", and {p[-1]}."
 
-def _speakResult(roles, cancel_event):
+def _speakResult(roles, cancel_event, tiRef=None):
     def _worker():
         if cancel_event.is_set(): return
         c = _countRoles(roles)
         def _speak():
             if cancel_event.is_set(): return
+            ti = tiRef() if isinstance(tiRef, weakref.ref) else tiRef
+            if tiRef is not None and not _shouldReportTI(ti):
+                cancel_event.set()
+                return
             msg = _summary(c)
             speech.cancelSpeech()
             ui.message(msg)
@@ -356,21 +416,24 @@ def _speakResult(roles, cancel_event):
 def _announce(tiRef, cancel_event):
     if cancel_event.is_set(): return
     ti = tiRef() if isinstance(tiRef, weakref.ref) else tiRef
-    if not ti or not _cfg()["enabled"]: return
+    if not _shouldReportTI(ti):
+        cancel_event.set()
+        return
     try:
         domain = _getDomain(ti)
         if _isBlocked(domain): return
 
         roles = _rolesFromFields(ti)
         if roles is not None:
-            _speakResult(roles, cancel_event)
+            _speakResult(roles, cancel_event, tiRef)
             return
 
         root = ti.rootNVDAObject
         if root is None: return
         def _onWalkDone(roles):
-            if not cancel_event.is_set():
-                _speakResult(roles, cancel_event)
+            currentTI = tiRef() if isinstance(tiRef, weakref.ref) else tiRef
+            if not cancel_event.is_set() and _shouldReportTI(currentTI):
+                _speakResult(roles, cancel_event, tiRef)
         _ChunkedWalker(root, cancel_event, _onWalkDone).start()
 
     except Exception:
@@ -380,6 +443,8 @@ def _announce(tiRef, cancel_event):
 # Schedule
 # ---------------------------------------------------------------------------
 def _scheduleAnnounce(ti, delay_ms=1500):
+    if not _shouldReportTI(ti):
+        return
     current_url  = _getPageIdentity(ti)
     cancel_event, should_schedule = _registerPending(ti, url=current_url)
     if not should_schedule:
@@ -388,6 +453,10 @@ def _scheduleAnnounce(ti, delay_ms=1500):
 
     def _afterDelay():
         if cancel_event.is_set(): return
+        currentTI = tiRef()
+        if not _shouldReportTI(currentTI):
+            cancel_event.set()
+            return
         threading.Thread(
             target=_waitThenAnnounce,
             args=(tiRef, cancel_event),
@@ -407,6 +476,8 @@ _orig_docLoadComplete = None
 
 def _isActiveTI(ti):
     """Return True only if ti is the currently focused treeInterceptor."""
+    if ti is None:
+        return False
     try:
         import api
         focusObj = api.getFocusObject()
@@ -428,6 +499,29 @@ def _isActiveTI(ti):
         pass
     return False
 
+def _shouldReportTI(ti):
+    return bool(
+        ti is not None
+        and _cfg().get("enabled", True)
+        and _looksLikeWebDocument(ti)
+        and _isActiveTI(ti)
+    )
+
+def _shouldReportTIOnEventQueue(ti, timeout=1.0):
+    if threading.current_thread() is threading.main_thread():
+        return _shouldReportTI(ti)
+    result = [False]
+    done = threading.Event()
+    def _check():
+        try:
+            result[0] = _shouldReportTI(ti)
+        except Exception:
+            result[0] = False
+        done.set()
+    queueHandler.queueFunction(queueHandler.eventQueue, _check)
+    done.wait(timeout=timeout)
+    return bool(result[0])
+
 def _installPatch():
     global _orig_loadBufferDone
     try:
@@ -435,7 +529,7 @@ def _installPatch():
         _orig_loadBufferDone = virtualBuffers.VirtualBuffer._loadBufferDone
         def _patched(self, *args, **kwargs):
             _orig_loadBufferDone(self, *args, **kwargs)
-            if _cfg()["enabled"] and _isActiveTI(self):
+            if _shouldReportTI(self):
                 if _globalPlugin and _globalPlugin._spaWatcher:
                     _globalPlugin._spaWatcher.updateTI(self)
                 _scheduleAnnounce(self)
@@ -450,7 +544,7 @@ def _installFallbackPatch():
         _orig_docLoadComplete = browseMode.BrowseModeDocumentTreeInterceptor.event_documentLoadComplete
         def _patched(self, obj, nextHandler):
             _orig_docLoadComplete(self, obj, nextHandler)
-            if _cfg()["enabled"] and _isActiveTI(self):
+            if _shouldReportTI(self):
                 _scheduleAnnounce(self)
         browseMode.BrowseModeDocumentTreeInterceptor.event_documentLoadComplete = _patched
     except Exception:
@@ -536,6 +630,10 @@ class SPAWatcher:
             return
         ti = self._ti_ref()
         if ti is None: return
+        if not _shouldReportTIOnEventQueue(ti):
+            self._pending_title = None
+            self._pending_since = 0.0
+            return
 
         raw_title = _getBrowserTitle()
         title = _normalizeTitle(raw_title)
@@ -625,4 +723,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def event_treeInterceptor_gainFocus(self, treeInterceptor, nextHandler):
         nextHandler()
-        self._spaWatcher.setActiveTI(treeInterceptor)
+        if _shouldReportTI(treeInterceptor):
+            self._spaWatcher.setActiveTI(treeInterceptor)
+        else:
+            self._spaWatcher.setActiveTI(None)
