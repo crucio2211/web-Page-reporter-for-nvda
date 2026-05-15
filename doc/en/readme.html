@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Page Reporter Help</title>
+</head>
+<body>
+
+<h1>Page Reporter</h1>
+<p>Version 3.0.1 &mdash; by Rosendo Barde Hubilla Jr. and Joseph Bautista</p>
+
+<p>Page Reporter automatically announces a summary of page elements every time a web page finishes loading in browse mode. Instead of manually navigating around to find out what is on the page, NVDA will tell you right away.</p>
+
+<p>Example announcement:</p>
+<blockquote>Page loaded. Page has 3 headings, 47 links, 7 form fields, and 4 landmarks.</blockquote>
+
+<p>It also works on single-page applications like Facebook, YouTube, Twitter/X, and Reddit &mdash; every time you navigate to a new section and the URL changes, Page Reporter will announce the updated element summary automatically.</p>
+
+<hr>
+
+<h2>Keyboard Shortcuts</h2>
+<dl>
+  <dt>NVDA+Shift+W</dt>
+  <dd>Toggle Page Reporter on or off. NVDA will say "Page Reporter on" or "Page Reporter off".</dd>
+  <dt>NVDA+Shift+R</dt>
+  <dd>Manually trigger a fresh recount of page elements at any time. Useful on pages that load content slowly or dynamically.</dd>
+</dl>
+
+<hr>
+
+<h2>Settings</h2>
+<p>To open Page Reporter settings, go to NVDA menu, then Preferences, then Settings, then choose Page Reporter from the category list.</p>
+
+<h3>Enable Page Reporter</h3>
+<p>This is the master on/off switch for the addon. You can also toggle this quickly using NVDA+Shift+W at any time.</p>
+
+<h3>Report these elements</h3>
+<p>You can choose which types of elements get included in the announcement. Each one can be turned on or off independently.</p>
+<ul>
+  <li><strong>Headings</strong> &mdash; counts heading elements (H1 through H6) on the page.</li>
+  <li><strong>Links</strong> &mdash; counts all clickable links.</li>
+  <li><strong>Form fields and buttons</strong> &mdash; counts text inputs, checkboxes, radio buttons, combo boxes, spin buttons, and all button types. Buttons are now grouped together with form fields for a cleaner summary.</li>
+  <li><strong>Landmarks</strong> &mdash; counts ARIA landmark regions such as navigation, main, banner, and search areas.</li>
+</ul>
+<p>If none of the enabled element types are found on the page, NVDA will simply say "Page loaded." with no counts.</p>
+
+<h3>Disabled sites</h3>
+<p>If you want Page Reporter to stay silent on certain websites, enter their domain names here, one per line. For example, entering <em>youtube.com</em> will silence Page Reporter on all YouTube pages including subdomains like music.youtube.com.</p>
+<p>You do not need to include www. &mdash; just the base domain is enough.</p>
+
+<p>All settings are saved automatically when you press OK in the NVDA Settings dialog.</p>
+
+<hr>
+
+<h2>Supported Browsers</h2>
+<p>Page Reporter works in any browser that NVDA supports in browse mode, including Google Chrome, Mozilla Firefox, Microsoft Edge, and Brave.</p>
+
+<hr>
+
+<h2>Known Limitations</h2>
+<ul>
+  <li>Pages that update content without changing the URL (such as infinite scroll feeds) will not trigger a new announcement.</li>
+  <li>On very heavily scripted pages, the announcement may appear a few seconds after the page loads while the addon waits for the page to finish rendering. Use NVDA+Shift+R to manually recount if needed.</li>
+  <li>Page Reporter only works in browse mode. Application mode (used in some web apps) is not supported.</li>
+</ul>
+
+<hr>
+
+<h2>What Changed in v3.0.1</h2>
+<ul>
+  <li>Fixed link count accuracy &mdash; offscreen links (below the viewport) were previously excluded from the count even though NVDA navigates them with the K key.</li>
+  <li>Fixed heading count accuracy &mdash; all headings are now counted to match NVDA H-key navigation behavior.</li>
+  <li>Fixed form field count accuracy &mdash; all form fields and buttons are now counted correctly regardless of visibility state.</li>
+  <li>Fixed landmark detection &mdash; landmarks are now detected via NVDA's virtual buffer attributes instead of role-based detection, which was causing massive false positives.</li>
+  <li>Buttons are now grouped with form fields in both the announcement and settings.</li>
+  <li>Added NVDA+Shift+R manual recount gesture.</li>
+  <li>Improved threading to prevent scan timeouts and partial counts on complex pages.</li>
+</ul>
+
+<hr>
+
+<h2>Authors</h2>
+<p>Rosendo Barde Hubilla Jr. and Joseph Bautista</p>
+
+</body>
+</html>
