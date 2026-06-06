@@ -1,0 +1,121 @@
+# Page Reporter translation template.
+# Copyright (C) 2026
+# This file is distributed under the same license as the Page Reporter add-on.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pageReporter 3.0.2\n"
+"Report-Msgid-Bugs-To: https://github.com/crucio2211/web-Page-reporter-for-"
+"nvda/issues\n"
+"POT-Creation-Date: 2026-06-06 00:00+0000\n"
+"PO-Revision-Date: 2026-06-06 15:04-0500\n"
+"Last-Translator: Luis Carlos González >Morales <luiscgmh@hotmail.com>\n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+
+#: globalPlugins/pageReporter.py
+#, python-format
+msgid "%d heading"
+msgid_plural "%d headings"
+msgstr[0] "%d encabezado"
+msgstr[1] "%d encabezados"
+
+#: globalPlugins/pageReporter.py
+#, python-format
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] "%d enlace"
+msgstr[1] "%d enlaces"
+
+#: globalPlugins/pageReporter.py
+#, python-format
+msgid "%d form field"
+msgid_plural "%d form fields"
+msgstr[0] "%d cuadro de edición"
+msgstr[1] "%d cuadros de edición"
+
+#: globalPlugins/pageReporter.py
+#, python-format
+msgid "%d landmark"
+msgid_plural "%d landmarks"
+msgstr[0] "%d punto de referencia"
+msgstr[1] "%d puntos de referencia"
+
+#: globalPlugins/pageReporter.py
+msgid "Page loaded."
+msgstr "Página cargada."
+
+#: globalPlugins/pageReporter.py
+#, python-brace-format
+msgid "Page loaded. Page has {elements}."
+msgstr "Página cargada. La página tiene {elements}."
+
+#: globalPlugins/pageReporter.py
+#, python-brace-format
+msgid "Page loaded. Page has {elements}, and {lastElement}."
+msgstr "Página cargada. La página tiene {elements} y {lastElement}."
+
+#: globalPlugins/pageReporter.py
+msgid "Page Reporter"
+msgstr "Anunciado de página"
+
+#: globalPlugins/pageReporter.py
+msgid "&Enable Page Reporter (NVDA+Shift+W)"
+msgstr "&Habilitar anunciado de página (NVDA+Shift+W)"
+
+#: globalPlugins/pageReporter.py
+msgid "Report these elements:"
+msgstr "Anunciar estos elementos:"
+
+#: globalPlugins/pageReporter.py
+msgid "&Headings"
+msgstr "&Encabezados"
+
+#: globalPlugins/pageReporter.py
+msgid "&Links"
+msgstr "E&nlaces"
+
+#: globalPlugins/pageReporter.py
+msgid "&Form fields && buttons"
+msgstr "&Cuadros de edición y botones"
+
+#: globalPlugins/pageReporter.py
+msgid "L&andmarks"
+msgstr "Punt&os de referencia"
+
+#: globalPlugins/pageReporter.py
+msgid "Disabled sites (one per line e.g. youtube.com):"
+msgstr "Sitios deshabilitados (uno por línea, por ejemplo, youtube.com):"
+
+#: globalPlugins/pageReporter.py
+msgid "Page Reporter on."
+msgstr "Anunciado de página activado."
+
+#: globalPlugins/pageReporter.py
+msgid "Page Reporter off."
+msgstr "Anunciado de página desactivado."
+
+#: globalPlugins/pageReporter.py
+msgid "Toggle Page Reporter on or off."
+msgstr "Activa o desactiva el anunciado de página."
+
+#: globalPlugins/pageReporter.py
+msgid "Page Reporter is off."
+msgstr "El anunciado de página está desactivado."
+
+#: globalPlugins/pageReporter.py
+msgid "No active web page."
+msgstr "No está en una página web activa."
+
+#: globalPlugins/pageReporter.py
+msgid "Recounting."
+msgstr "Contando."
+
+#: globalPlugins/pageReporter.py
+msgid "Manually recount page elements (NVDA+Shift+R)."
+msgstr "Contar manualmente los elementos de la página (NVDA+Shift+R)."
