@@ -173,6 +173,12 @@ from collections import deque
 addonHandler.initTranslation()
 
 try:
+    ngettext
+except NameError:
+    def ngettext(singular, plural, count):
+        return singular if count == 1 else plural
+
+try:
     from gui.settingsDialogs import SettingsPanel
 except ImportError:
     from gui import SettingsPanel
@@ -277,6 +283,19 @@ _BROWSER_APP_NAMES = frozenset({
     "zen",
 })
 
+_EMBEDDED_BROWSER_APP_NAMES = frozenset({
+    "discord",
+    "msteams",
+    "ms-teams",
+    "outlook",
+    "slack",
+    "spotify",
+    "teams",
+    "thunderbird",
+    "webex",
+    "zoom",
+})
+
 # ---------------------------------------------------------------------------
 # URL / title helpers
 # ---------------------------------------------------------------------------
@@ -346,9 +365,12 @@ def _getTIAppName(ti):
         return ""
 
 def _looksLikeWebDocument(ti):
-    if _getURL(ti):
-        return True
-    return _getTIAppName(ti) in _BROWSER_APP_NAMES
+    appName = _getTIAppName(ti)
+    if appName in _EMBEDDED_BROWSER_APP_NAMES:
+        return False
+    if appName:
+        return appName in _BROWSER_APP_NAMES
+    return False
 
 # ---------------------------------------------------------------------------
 # busy:true retry
@@ -614,14 +636,21 @@ def _countRoles(roles):
 
 def _summary(c):
     cfg = _cfg(); p = []
-    if cfg["reportHeadings"]   and c["h"]  > 0: p.append(f"{c['h']} heading{'s' if c['h']!=1 else ''}")
-    if cfg["reportLinks"]      and c["lk"] > 0: p.append(f"{c['lk']} link{'s' if c['lk']!=1 else ''}")
-    if cfg["reportFormFields"] and c["fm"] > 0: p.append(f"{c['fm']} form field{'s' if c['fm']!=1 else ''}")
-    if cfg["reportLandmarks"]  and c["lm"] > 0: p.append(f"{c['lm']} landmark{'s' if c['lm']!=1 else ''}")
-    if not p: return "Page loaded."
+    if cfg["reportHeadings"] and c["h"] > 0:
+        p.append(ngettext("%d heading", "%d headings", c["h"]) % c["h"])
+    if cfg["reportLinks"] and c["lk"] > 0:
+        p.append(ngettext("%d link", "%d links", c["lk"]) % c["lk"])
+    if cfg["reportFormFields"] and c["fm"] > 0:
+        p.append(ngettext("%d form field", "%d form fields", c["fm"]) % c["fm"])
+    if cfg["reportLandmarks"] and c["lm"] > 0:
+        p.append(ngettext("%d landmark", "%d landmarks", c["lm"]) % c["lm"])
+    if not p: return _("Page loaded.")
     if len(p) == 1:
-        return f"Page loaded. Page has {p[0]}."
-    return "Page loaded. Page has " + ", ".join(p[:-1]) + f", and {p[-1]}."
+        return _("Page loaded. Page has {elements}.").format(elements=p[0])
+    return _("Page loaded. Page has {elements}, and {lastElement}.").format(
+        elements=", ".join(p[:-1]),
+        lastElement=p[-1],
+    )
 
 def _speakResult(roles, cancel_event, tiRef=None):
     def _worker():
@@ -903,19 +932,19 @@ class SPAWatcher:
 # Settings panel
 # ---------------------------------------------------------------------------
 class PageReporterSettingsPanel(SettingsPanel):
-    title = "Page Reporter"
+    title = _("Page Reporter")
 
     def makeSettings(self, settingsSizer):
         helper = guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
-        self.enabledCb = helper.addItem(wx.CheckBox(self, label="&Enable Page Reporter (NVDA+Shift+W)"))
+        self.enabledCb = helper.addItem(wx.CheckBox(self, label=_("&Enable Page Reporter (NVDA+Shift+W)")))
         self.enabledCb.SetValue(_cfg()["enabled"])
-        eb = guiHelper.BoxSizerHelper(self, sizer=wx.StaticBoxSizer(wx.StaticBox(self, label="Report these elements:"), wx.VERTICAL))
+        eb = guiHelper.BoxSizerHelper(self, sizer=wx.StaticBoxSizer(wx.StaticBox(self, label=_("Report these elements:")), wx.VERTICAL))
         helper.addItem(eb.sizer)
-        self.hCb  = eb.addItem(wx.CheckBox(self, label="&Headings"));    self.hCb.SetValue(_cfg()["reportHeadings"])
-        self.lkCb = eb.addItem(wx.CheckBox(self, label="&Links"));       self.lkCb.SetValue(_cfg()["reportLinks"])
-        self.fmCb = eb.addItem(wx.CheckBox(self, label="&Form fields && buttons")); self.fmCb.SetValue(_cfg()["reportFormFields"])
-        self.lmCb = eb.addItem(wx.CheckBox(self, label="L&andmarks"));   self.lmCb.SetValue(_cfg()["reportLandmarks"])
-        sb = guiHelper.BoxSizerHelper(self, sizer=wx.StaticBoxSizer(wx.StaticBox(self, label="Disabled sites (one per line e.g. youtube.com):"), wx.VERTICAL))
+        self.hCb  = eb.addItem(wx.CheckBox(self, label=_("&Headings")));    self.hCb.SetValue(_cfg()["reportHeadings"])
+        self.lkCb = eb.addItem(wx.CheckBox(self, label=_("&Links")));       self.lkCb.SetValue(_cfg()["reportLinks"])
+        self.fmCb = eb.addItem(wx.CheckBox(self, label=_("&Form fields && buttons"))); self.fmCb.SetValue(_cfg()["reportFormFields"])
+        self.lmCb = eb.addItem(wx.CheckBox(self, label=_("L&andmarks")));   self.lmCb.SetValue(_cfg()["reportLandmarks"])
+        sb = guiHelper.BoxSizerHelper(self, sizer=wx.StaticBoxSizer(wx.StaticBox(self, label=_("Disabled sites (one per line e.g. youtube.com):")), wx.VERTICAL))
         helper.addItem(sb.sizer)
         raw = _cfg().get("blockedSites", "")
         self.siteCtrl = sb.addItem(wx.TextCtrl(self, value="\n".join(s.strip() for s in raw.split(",") if s.strip()), style=wx.TE_MULTILINE, size=(-1, 80)))
@@ -959,12 +988,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         s = not _cfg()["enabled"]
         _config["enabled"] = s
         _saveConfig()  # saves to JSON only — does NOT touch nvda.ini
-        ui.message(f"Page Reporter {'on' if s else 'off'}.")
-    script_togglePageReporter.__doc__ = "Toggle Page Reporter on or off."
+        ui.message(_("Page Reporter on.") if s else _("Page Reporter off."))
+    script_togglePageReporter.__doc__ = _("Toggle Page Reporter on or off.")
     def script_manualRecount(self, gesture):
         """Manually trigger a fresh page element recount."""
         if not _cfg().get("enabled", True):
-            ui.message("Page Reporter is off.")
+            ui.message(_("Page Reporter is off."))
             return
         try:
             import api
@@ -973,9 +1002,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         except Exception:
             ti = None
         if not _shouldReportTI(ti):
-            ui.message("No active web page.")
+            ui.message(_("No active web page."))
             return
-        ui.message("Recounting.")
+        ui.message(_("Recounting."))
         tiRef = weakref.ref(ti)
         cancel_event, _ = _registerPending(ti, url=None)
         def _doManual():
@@ -995,7 +1024,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                     _ChunkedWalker(root, cancel_event, _onDone).start()
                 wx.CallAfter(_startWalk)
         threading.Thread(target=_doManual, daemon=True, name="PageReporter-manual").start()
-    script_manualRecount.__doc__ = "Manually recount page elements (NVDA+Shift+R)."
+    script_manualRecount.__doc__ = _("Manually recount page elements (NVDA+Shift+R).")
 
 
 
