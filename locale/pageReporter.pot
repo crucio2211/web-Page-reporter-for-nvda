@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: pageReporter 3.0.4\n"
+"Project-Id-Version: pageReporter 3.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/crucio2211/web-Page-reporter-for-nvda/issues\n"
 "POT-Creation-Date: 2026-07-07 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -116,15 +116,7 @@ msgid "Disabled sites (one per line e.g. youtube.com):"
 msgstr ""
 
 #: globalPlugins/pageReporter.py
-msgid "Page Reporter: full report."
-msgstr ""
-
-#: globalPlugins/pageReporter.py
-msgid "Page Reporter: brief report."
-msgstr ""
-
-#: globalPlugins/pageReporter.py
-msgid "Page Reporter off."
+msgid "Off"
 msgstr ""
 
 #: globalPlugins/pageReporter.py

@@ -1032,11 +1032,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         _setReportMode(nextMode)
         _saveConfig()  # saves to JSON only — does NOT touch nvda.ini
         if nextMode == _REPORT_MODE_FULL:
-            ui.message(_("Page Reporter: full report."))
+            ui.message(_("Full report"))
         elif nextMode == _REPORT_MODE_BRIEF:
-            ui.message(_("Page Reporter: brief report."))
+            ui.message(_("Brief report"))
         else:
-            ui.message(_("Page Reporter off."))
+            ui.message(_("Off"))
     script_togglePageReporter.__doc__ = _("Cycle Page Reporter between full report, brief report, and off.")
     def script_manualRecount(self, gesture):
         """Manually trigger a fresh page element recount."""

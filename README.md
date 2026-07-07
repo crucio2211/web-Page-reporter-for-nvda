@@ -59,4 +59,4 @@ The installed add-on documentation is available in:
 
 ## Version
 
-Current version: 3.0.4
+Current version: 3.1.0
