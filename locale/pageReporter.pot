@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: pageReporter 3.0.3\n"
+"Project-Id-Version: pageReporter 3.0.4\n"
 "Report-Msgid-Bugs-To: https://github.com/crucio2211/web-Page-reporter-for-nvda/issues\n"
 "POT-Creation-Date: 2026-07-07 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -105,6 +105,10 @@ msgstr ""
 
 #: globalPlugins/pageReporter.py
 msgid "L&andmarks"
+msgstr ""
+
+#: globalPlugins/pageReporter.py
+msgid "&Interrupt speech before Page Reporter announcements"
 msgstr ""
 
 #: globalPlugins/pageReporter.py

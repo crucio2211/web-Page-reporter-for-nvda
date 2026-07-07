@@ -200,6 +200,7 @@ _DEFAULTS = {
     "reportLinks":      True,
     "reportFormFields": True,
     "reportLandmarks":  True,
+    "interruptSpeech":  False,
     "blockedSites":     "",
 }
 
@@ -693,7 +694,8 @@ def _speakResult(roles, cancel_event, tiRef=None):
                 cancel_event.set()
                 return
             msg = _summary(c)
-            speech.cancelSpeech()
+            if _cfg().get("interruptSpeech", False):
+                speech.cancelSpeech()
             ui.message(msg)
             if _globalPlugin and _globalPlugin._spaWatcher:
                 title = _getBrowserTitle()
@@ -980,6 +982,8 @@ class PageReporterSettingsPanel(SettingsPanel):
         self.lkCb = eb.addItem(wx.CheckBox(self, label=_("&Links")));       self.lkCb.SetValue(_cfg()["reportLinks"])
         self.fmCb = eb.addItem(wx.CheckBox(self, label=_("&Form fields && buttons"))); self.fmCb.SetValue(_cfg()["reportFormFields"])
         self.lmCb = eb.addItem(wx.CheckBox(self, label=_("L&andmarks")));   self.lmCb.SetValue(_cfg()["reportLandmarks"])
+        self.interruptSpeechCb = helper.addItem(wx.CheckBox(self, label=_("&Interrupt speech before Page Reporter announcements")))
+        self.interruptSpeechCb.SetValue(_cfg()["interruptSpeech"])
         sb = guiHelper.BoxSizerHelper(self, sizer=wx.StaticBoxSizer(wx.StaticBox(self, label=_("Disabled sites (one per line e.g. youtube.com):")), wx.VERTICAL))
         helper.addItem(sb.sizer)
         raw = _cfg().get("blockedSites", "")
@@ -993,6 +997,7 @@ class PageReporterSettingsPanel(SettingsPanel):
         _config["reportLinks"]      = self.lkCb.GetValue()
         _config["reportFormFields"] = self.fmCb.GetValue()
         _config["reportLandmarks"]  = self.lmCb.GetValue()
+        _config["interruptSpeech"]  = self.interruptSpeechCb.GetValue()
         _config["blockedSites"]     = ",".join(s.strip().lower() for s in self.siteCtrl.GetValue().splitlines() if s.strip())
         _saveConfig()
 

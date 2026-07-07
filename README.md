@@ -21,6 +21,7 @@ The add-on is intended for real web browsers such as Google Chrome, Mozilla Fire
 - Announces when a supported browser page finishes loading.
 - Reports configurable counts for headings, links, form fields/buttons, and landmarks.
 - Supports full report and brief report announcement modes.
+- Lets users choose whether Page Reporter interrupts current NVDA speech before speaking.
 - Supports dynamic sites and single-page apps where the visible page changes after navigation.
 - Provides a manual recount command with `NVDA+Shift+R`.
 - Provides a quick full report / brief report / off cycle with `NVDA+Shift+W`.
@@ -33,6 +34,7 @@ Open NVDA Preferences and choose the Page Reporter settings panel. From there yo
 - Enable or disable Page Reporter.
 - Choose full report or brief report mode.
 - Choose which element types are included in page summaries.
+- Choose whether Page Reporter should interrupt current speech before its announcements.
 - Disable reporting for specific domains, one domain per line.
 
 ## Localization
@@ -57,4 +59,4 @@ The installed add-on documentation is available in:
 
 ## Version
 
-Current version: 3.0.3
+Current version: 3.0.4
