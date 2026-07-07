@@ -7,12 +7,14 @@
 <body>
 
 <h1>Page Reporter</h1>
-<p>Version 3.0.1 &mdash; by Rosendo Barde Hubilla Jr. and Joseph Bautista</p>
+<p>Version 3.0.3 &mdash; by Rosendo Barde Hubilla Jr. and Joseph Bautista</p>
 
 <p>Page Reporter automatically announces a summary of page elements every time a web page finishes loading in browse mode. Instead of manually navigating around to find out what is on the page, NVDA will tell you right away.</p>
 
 <p>Example announcement:</p>
 <blockquote>Page loaded. Page has 3 headings, 47 links, 7 form fields, and 4 landmarks.</blockquote>
+<p>In brief report mode, Page Reporter speaks only the element summary:</p>
+<blockquote>3 headings, 47 links, 7 form fields, and 4 landmarks.</blockquote>
 
 <p>It also works on single-page applications like Facebook, YouTube, Twitter/X, and Reddit &mdash; every time you navigate to a new section and the URL changes, Page Reporter will announce the updated element summary automatically.</p>
 
@@ -21,7 +23,7 @@
 <h2>Keyboard Shortcuts</h2>
 <dl>
   <dt>NVDA+Shift+W</dt>
-  <dd>Toggle Page Reporter on or off. NVDA will say "Page Reporter on" or "Page Reporter off".</dd>
+  <dd>Cycle Page Reporter between full report, brief report, and off.</dd>
   <dt>NVDA+Shift+R</dt>
   <dd>Manually trigger a fresh recount of page elements at any time. Useful on pages that load content slowly or dynamically.</dd>
 </dl>
@@ -32,7 +34,10 @@
 <p>To open Page Reporter settings, go to NVDA menu, then Preferences, then Settings, then choose Page Reporter from the category list.</p>
 
 <h3>Enable Page Reporter</h3>
-<p>This is the master on/off switch for the addon. You can also toggle this quickly using NVDA+Shift+W at any time.</p>
+<p>This is the master on/off switch for the addon. You can also cycle between full report, brief report, and off using NVDA+Shift+W at any time.</p>
+
+<h3>Announcement mode</h3>
+<p>Full report says the page-loaded phrase and the element summary. Brief report says only the element summary.</p>
 
 <h3>Report these elements</h3>
 <p>You can choose which types of elements get included in the announcement. Each one can be turned on or off independently.</p>
@@ -42,7 +47,7 @@
   <li><strong>Form fields and buttons</strong> &mdash; counts text inputs, checkboxes, radio buttons, combo boxes, spin buttons, and all button types. Buttons are now grouped together with form fields for a cleaner summary.</li>
   <li><strong>Landmarks</strong> &mdash; counts ARIA landmark regions such as navigation, main, banner, and search areas.</li>
 </ul>
-<p>If none of the enabled element types are found on the page, NVDA will simply say "Page loaded." with no counts.</p>
+<p>If none of the enabled element types are found on the page, full report mode says "Page loaded." with no counts. Brief report mode says "No elements found."</p>
 
 <h3>Disabled sites</h3>
 <p>If you want Page Reporter to stay silent on certain websites, enter their domain names here, one per line. For example, entering <em>youtube.com</em> will silence Page Reporter on all YouTube pages including subdomains like music.youtube.com.</p>
@@ -65,6 +70,14 @@
 </ul>
 
 <hr>
+
+<h2>What Changed in v3.0.3</h2>
+<ul>
+  <li>Added a three-state NVDA+Shift+W cycle: full report, brief report, and off.</li>
+  <li>Added brief report mode, which speaks only the element counts without the page-loaded phrase.</li>
+  <li>Added Spanish localization files in the standard NVDA add-on locale folder.</li>
+  <li>Restored the English root manifest and moved Spanish manifest text into locale/es/manifest.ini.</li>
+</ul>
 
 <h2>What Changed in v3.0.1</h2>
 <ul>

@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: pageReporter 3.0.2\n"
+"Project-Id-Version: pageReporter 3.0.3\n"
 "Report-Msgid-Bugs-To: https://github.com/crucio2211/web-Page-reporter-for-"
 "nvda/issues\n"
 "POT-Creation-Date: 2026-06-06 00:00+0000\n"
@@ -51,6 +51,15 @@ msgid "Page loaded."
 msgstr "Página cargada."
 
 #: globalPlugins/pageReporter.py
+msgid "No elements found."
+msgstr "No se encontraron elementos."
+
+#: globalPlugins/pageReporter.py
+#, python-brace-format
+msgid "{elements}, and {lastElement}."
+msgstr "{elements} y {lastElement}."
+
+#: globalPlugins/pageReporter.py
 #, python-brace-format
 msgid "Page loaded. Page has {elements}."
 msgstr "Página cargada. La página tiene {elements}."
@@ -67,6 +76,18 @@ msgstr "Anunciado de página"
 #: globalPlugins/pageReporter.py
 msgid "&Enable Page Reporter (NVDA+Shift+W)"
 msgstr "&Habilitar anunciado de página (NVDA+Shift+W)"
+
+#: globalPlugins/pageReporter.py
+msgid "Announcement mode:"
+msgstr "Modo de anuncio:"
+
+#: globalPlugins/pageReporter.py
+msgid "Full report"
+msgstr "Anuncio completo"
+
+#: globalPlugins/pageReporter.py
+msgid "Brief report"
+msgstr "Anuncio breve"
 
 #: globalPlugins/pageReporter.py
 msgid "Report these elements:"
@@ -101,8 +122,20 @@ msgid "Page Reporter off."
 msgstr "Anunciado de página desactivado."
 
 #: globalPlugins/pageReporter.py
+msgid "Page Reporter: full report."
+msgstr "Anunciado de página: anuncio completo."
+
+#: globalPlugins/pageReporter.py
+msgid "Page Reporter: brief report."
+msgstr "Anunciado de página: anuncio breve."
+
+#: globalPlugins/pageReporter.py
 msgid "Toggle Page Reporter on or off."
 msgstr "Activa o desactiva el anunciado de página."
+
+#: globalPlugins/pageReporter.py
+msgid "Cycle Page Reporter between full report, brief report, and off."
+msgstr "Alterna el anunciado de página entre anuncio completo, anuncio breve y desactivado."
 
 #: globalPlugins/pageReporter.py
 msgid "Page Reporter is off."

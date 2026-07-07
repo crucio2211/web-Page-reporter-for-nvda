@@ -195,6 +195,7 @@ _CONFIG_PATH = os.path.join(
 
 _DEFAULTS = {
     "enabled":          True,
+    "reportMode":       "full",
     "reportHeadings":   True,
     "reportLinks":      True,
     "reportFormFields": True,
@@ -228,6 +229,26 @@ def _saveConfig():
 
 def _cfg():
     return _config
+
+_REPORT_MODE_FULL = "full"
+_REPORT_MODE_BRIEF = "brief"
+_REPORT_MODE_OFF = "off"
+_REPORT_MODES = (_REPORT_MODE_FULL, _REPORT_MODE_BRIEF, _REPORT_MODE_OFF)
+
+def _getReportMode():
+    if not _cfg().get("enabled", True):
+        return _REPORT_MODE_OFF
+    mode = _cfg().get("reportMode", _REPORT_MODE_FULL)
+    if mode not in (_REPORT_MODE_FULL, _REPORT_MODE_BRIEF):
+        return _REPORT_MODE_FULL
+    return mode
+
+def _setReportMode(mode):
+    if mode == _REPORT_MODE_OFF:
+        _config["enabled"] = False
+        return
+    _config["enabled"] = True
+    _config["reportMode"] = mode if mode in (_REPORT_MODE_FULL, _REPORT_MODE_BRIEF) else _REPORT_MODE_FULL
 
 def _isBlocked(domain):
     if not domain: return False
@@ -644,7 +665,16 @@ def _summary(c):
         p.append(ngettext("%d form field", "%d form fields", c["fm"]) % c["fm"])
     if cfg["reportLandmarks"] and c["lm"] > 0:
         p.append(ngettext("%d landmark", "%d landmarks", c["lm"]) % c["lm"])
-    if not p: return _("Page loaded.")
+    mode = _getReportMode()
+    if not p:
+        return _("No elements found.") if mode == _REPORT_MODE_BRIEF else _("Page loaded.")
+    if mode == _REPORT_MODE_BRIEF:
+        if len(p) == 1:
+            return p[0]
+        return _("{elements}, and {lastElement}.").format(
+            elements=", ".join(p[:-1]),
+            lastElement=p[-1],
+        )
     if len(p) == 1:
         return _("Page loaded. Page has {elements}.").format(elements=p[0])
     return _("Page loaded. Page has {elements}, and {lastElement}.").format(
@@ -938,6 +968,12 @@ class PageReporterSettingsPanel(SettingsPanel):
         helper = guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
         self.enabledCb = helper.addItem(wx.CheckBox(self, label=_("&Enable Page Reporter (NVDA+Shift+W)")))
         self.enabledCb.SetValue(_cfg()["enabled"])
+        self.modeChoice = helper.addLabeledControl(
+            _("Announcement mode:"),
+            wx.Choice,
+            choices=[_("Full report"), _("Brief report")],
+        )
+        self.modeChoice.SetSelection(1 if _getReportMode() == _REPORT_MODE_BRIEF else 0)
         eb = guiHelper.BoxSizerHelper(self, sizer=wx.StaticBoxSizer(wx.StaticBox(self, label=_("Report these elements:")), wx.VERTICAL))
         helper.addItem(eb.sizer)
         self.hCb  = eb.addItem(wx.CheckBox(self, label=_("&Headings")));    self.hCb.SetValue(_cfg()["reportHeadings"])
@@ -952,6 +988,7 @@ class PageReporterSettingsPanel(SettingsPanel):
     def onSave(self):
         # Write only to our own JSON — never touches NVDA's config
         _config["enabled"]          = self.enabledCb.GetValue()
+        _config["reportMode"]       = _REPORT_MODE_BRIEF if self.modeChoice.GetSelection() == 1 else _REPORT_MODE_FULL
         _config["reportHeadings"]   = self.hCb.GetValue()
         _config["reportLinks"]      = self.lkCb.GetValue()
         _config["reportFormFields"] = self.fmCb.GetValue()
@@ -985,11 +1022,17 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         super().terminate()
 
     def script_togglePageReporter(self, gesture):
-        s = not _cfg()["enabled"]
-        _config["enabled"] = s
+        currentMode = _getReportMode()
+        nextMode = _REPORT_MODES[(_REPORT_MODES.index(currentMode) + 1) % len(_REPORT_MODES)]
+        _setReportMode(nextMode)
         _saveConfig()  # saves to JSON only — does NOT touch nvda.ini
-        ui.message(_("Page Reporter on.") if s else _("Page Reporter off."))
-    script_togglePageReporter.__doc__ = _("Toggle Page Reporter on or off.")
+        if nextMode == _REPORT_MODE_FULL:
+            ui.message(_("Page Reporter: full report."))
+        elif nextMode == _REPORT_MODE_BRIEF:
+            ui.message(_("Page Reporter: brief report."))
+        else:
+            ui.message(_("Page Reporter off."))
+    script_togglePageReporter.__doc__ = _("Cycle Page Reporter between full report, brief report, and off.")
     def script_manualRecount(self, gesture):
         """Manually trigger a fresh page element recount."""
         if not _cfg().get("enabled", True):

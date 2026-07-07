@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: pageReporter 3.0.2\n"
+"Project-Id-Version: pageReporter 3.0.3\n"
 "Report-Msgid-Bugs-To: https://github.com/crucio2211/web-Page-reporter-for-nvda/issues\n"
-"POT-Creation-Date: 2026-06-06 00:00+0000\n"
+"POT-Creation-Date: 2026-07-07 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,16 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: globalPlugins/pageReporter.py
+msgid "No elements found."
+msgstr ""
+
+#: globalPlugins/pageReporter.py
 msgid "Page loaded."
+msgstr ""
+
+#: globalPlugins/pageReporter.py
+#, python-brace-format
+msgid "{elements}, and {lastElement}."
 msgstr ""
 
 #: globalPlugins/pageReporter.py
@@ -64,6 +73,18 @@ msgstr ""
 
 #: globalPlugins/pageReporter.py
 msgid "&Enable Page Reporter (NVDA+Shift+W)"
+msgstr ""
+
+#: globalPlugins/pageReporter.py
+msgid "Announcement mode:"
+msgstr ""
+
+#: globalPlugins/pageReporter.py
+msgid "Full report"
+msgstr ""
+
+#: globalPlugins/pageReporter.py
+msgid "Brief report"
 msgstr ""
 
 #: globalPlugins/pageReporter.py
@@ -91,7 +112,11 @@ msgid "Disabled sites (one per line e.g. youtube.com):"
 msgstr ""
 
 #: globalPlugins/pageReporter.py
-msgid "Page Reporter on."
+msgid "Page Reporter: full report."
+msgstr ""
+
+#: globalPlugins/pageReporter.py
+msgid "Page Reporter: brief report."
 msgstr ""
 
 #: globalPlugins/pageReporter.py
@@ -99,7 +124,7 @@ msgid "Page Reporter off."
 msgstr ""
 
 #: globalPlugins/pageReporter.py
-msgid "Toggle Page Reporter on or off."
+msgid "Cycle Page Reporter between full report, brief report, and off."
 msgstr ""
 
 #: globalPlugins/pageReporter.py
