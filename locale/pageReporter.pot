@@ -116,7 +116,7 @@ msgid "Disabled sites (one per line e.g. youtube.com):"
 msgstr ""
 
 #: globalPlugins/pageReporter.py
-msgid "Off"
+msgid "Page Reporter off."
 msgstr ""
 
 #: globalPlugins/pageReporter.py

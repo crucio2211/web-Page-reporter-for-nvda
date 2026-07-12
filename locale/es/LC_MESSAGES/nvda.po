@@ -118,8 +118,8 @@ msgid "Disabled sites (one per line e.g. youtube.com):"
 msgstr "Sitios deshabilitados (uno por línea, por ejemplo, youtube.com):"
 
 #: globalPlugins/pageReporter.py
-msgid "Off"
-msgstr "Desactivado"
+msgid "Page Reporter off."
+msgstr "Anunciado de página desactivado."
 
 #: globalPlugins/pageReporter.py
 msgid "Cycle Page Reporter between full report, brief report, and off."

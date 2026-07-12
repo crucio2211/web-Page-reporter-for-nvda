@@ -1036,7 +1036,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         elif nextMode == _REPORT_MODE_BRIEF:
             ui.message(_("Brief report"))
         else:
-            ui.message(_("Off"))
+            ui.message(_("Page Reporter off."))
     script_togglePageReporter.__doc__ = _("Cycle Page Reporter between full report, brief report, and off.")
     def script_manualRecount(self, gesture):
         """Manually trigger a fresh page element recount."""
